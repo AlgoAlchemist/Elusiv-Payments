@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elusiv ZK payments Interface</title>
+    <script src="elusive.js"></script>
+    <style>
+      body {
+        background: linear-gradient(to right, #2b2d42, #000000);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      button {
+        font-size: 2em;
+        padding: 1em 2em;
+        border-radius: 1em;
+        background-color: #f5f5f5;
+        color: #2b2d42;
+        border: none;
+        margin: 1em;
+        cursor: pointer;
+      }
+
+      input {
+        font-size: 1.5em;
+        padding: 0.5em 1em;
+        border-radius: 0.5em;
+        border: none;
+        margin: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <button id="connect-button">Connect to Phantom Wallet</button>
+    </div>
+    <div>
+      <input type="text" id="topup-amount" placeholder="Enter top-up amount"></input>
+      <button id="topup-button">Top Up</button>
+    </div>
+    <div>
+      <input type="text" id="transfer-amount" placeholder="Enter transfer amount"></input>
+      <input type="text" id="transfer-recipient" placeholder="Enter recipient's public key"></input>
+      <button id="transfer-button">Transfer</button>
+    </div>
+    <script>
+      const connectButton = document.getElementById("connect-button");
+      const topupButton = document.getElementById("topup-button");
+      const topupAmount = document.getElementById("top up-amount");
+const transferButton = document.getElementById("transfer-button");
+const transferAmount = document.getElementById("transfer-amount");
+const transferRecipient = document.getElementById("transfer-recipient");
+const getProvider = () => {
+  if ('phantom' in window) {
+    const provider = window.phantom?.solana;
+
+    if (provider?.isPhantom) {
+      return provider;
+    }
+  }
+
+  window.open('https://phantom.app/', '_blank');
+};
+
+let provider;
+connectButton.addEventListener("click", async () => {
+  provider = await getProvider();
+  try {
+      const resp = await provider.connect();
+      console.log(resp.publicKey.toString());
+  } catch (err) {
+      console.log(err);
+  }
+});
+
+topupButton.addEventListener("click", async () => {
+  if (!provider) {
+    console.log("Please connect to a Phantom Wallet first.");
+    return;
+  }
+
+  // Create the elusiv instance
+  const elusiv = await Elusiv.getElusivInstance(seed, provider.publicKey, connection);
+
+  // Top up our private balance with the specified amount
+  const topupAmountValue = parseFloat(topupAmount.value);
+  const topupTxData = await elusiv.buildTopUpTx(topupAmountValue * LAMPORTS_PER_SOL, 'LAMPORTS');
+
+  // Sign the transaction using the connected Phantom Wallet
+  topupTxData.tx = await provider.sign(topupTxData.tx);
+
+  const storeRes = await elusiv.sendElusivTx(topupTxData);
+  console.log("Top up successful!");
+});
+
+transferButton.addEventListener("click", async () => {
+  if (!provider) {
+    console.log("Please connect to a Phantom Wallet first.");
+    return;
+  }
+
+  // Create the elusiv instance
+  const elusiv = await Elusiv.getElusivInstance(seed, provider.publicKey, connection);
+
+  // Send the specified amount, privately 😎
+  const transferAmountValue = parseFloat(transferAmount.value);
+  const recipientValue = transferRecipient.value;
+  const sendTx = await elusiv.buildSendTx(transferAmountValue * LAMPORTS_PER_SOL, recipientValue, 'LAMPORTS');
+
+  // Sign the transaction using the connected Phantom Wallet
+  sendTx.tx = await provider.sign(sendTx.tx);
+
+  const sendRes = await elusiv.sendElusivTx(sendTx);
+  console.log("Transfer successful!");
+});
+</script>
+</body>
+</html>

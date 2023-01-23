@@ -1,0 +1,17 @@
+{
+  "name": "elusive-front",
+  "version": "1.0.0",
+  "description": "simple frontend for elusive",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "i": "^0.3.7",
+    "package": "^1.0.1"
+  }
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elusive SDK and Phantom Wallet Example</title>
+    <script src="elusive.js"></script>
+  </head>
+  <body>
+    <button id="connect-button">Connect to Phantom Wallet</button>
+    <button id="topup-button">Top Up</button>
+    <button id="send-button">Send</button>
+    <script>
+      const connectButton = document.getElementById("connect-button");
+      const topupButton = document.getElementById("topup-button");
+      const sendButton = document.getElementById("send-button");
+
+      const getProvider = () => {
+        if ('phantom' in window) {
+          const provider = window.phantom?.solana;
+
+          if (provider?.isPhantom) {
+            return provider;
+          }
+        }
+
+        window.open('https://phantom.app/', '_blank');
+      };
+
+      let provider;
+      connectButton.addEventListener("click", async () => {
+        provider = await getProvider();
+        try {
+            const resp = await provider.connect();
+            console.log(resp.publicKey.toString());
+        } catch (err) {
+            console.log(err);
+        }
+      });
+
+      topupButton.addEventListener("click", async () => {
+        if (!provider) {
+          console.log("Please connect to a Phantom Wallet first.");
+          return;
+        }
+
+        // Create the elusiv instance
+        const elusiv = await Elusiv.getElusivInstance(seed, provider.publicKey, connection);
+
+        // Top up our private balance with 1 SOL
+        const topupTxData = await elusiv.buildTopUpTx(LAMPORTS_PER_SOL, 'LAMPORTS');
+
+        // Sign the transaction using the connected Phantom Wallet
+        topupTxData.tx = await provider.sign(topupTxData.tx);
+
+        const storeRes = await elusiv.sendElusivTx(topupTxData);
+        console.log("Top up successful!");
+      });
+
+      sendButton.addEventListener("click", async () => {
+        if (!provider) {
+          console.log("Please connect to a Phantom Wallet first.");
+          return;
+        }
+
+        // Create the elusiv instance
+        const elusiv = await Elusiv.getElusivInstance(seed, provider.publicKey, connection);
+
+        // Send half a SOL, privately 😎
+        const sendTx = await elusiv.buildSendTx(0.5 * LAMPORTS_PER_SOL, recipient, 'LAMPORTS');
+
+        // Sign the transaction using the connected Phantom Wallet
+        sendTx.tx = await provider.sign(sendTx.tx);
+
+        const sendRes = await elusiv.sendElusivTx(sendTx);
+        console.log("Send successful!");
+      });
+    </script>
+  </body>
+</html>

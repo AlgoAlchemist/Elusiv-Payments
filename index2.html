@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elusive SDK Example</title>
+    <script src="elusive.js"></script>
+  </head>
+  <body>
+    <button id="topup-button">Top Up</button>
+    <button id="send-button">Send</button>
+    <script>
+      const topupButton = document.getElementById("topup-button");
+      const sendButton = document.getElementById("send-button");
+
+      topupButton.addEventListener("click", async () => {
+        // Create the elusiv instance
+        const elusiv = await Elusiv.getElusivInstance(seed, getUserPubKey(), connection);
+
+        // Top up our private balance with 1 SOL
+        const topupTxData = await elusiv.buildTopUpTx(LAMPORTS_PER_SOL, 'LAMPORTS');
+
+        // Since this the topup, the funds still come from our original wallet. This is just
+        // a regular Solana transaction in this case.
+        topupTxData.tx = signTx(topupTxData.tx);
+
+        const storeRes = await elusiv.sendElusivTx(topupTxData);
+        console.log("Top up successful!");
+      });
+
+      sendButton.addEventListener("click", async () => {
+        // Create the elusiv instance
+        const elusiv = await Elusiv.getElusivInstance(seed, getUserPubKey(), connection);
+
+        // Send half a SOL, privately 😎
+        const sendTx = await elusiv.buildSendTx(0.5 * LAMPORTS_PER_SOL, recipient, 'LAMPORTS');
+
+        const sendRes = await elusiv.sendElusivTx(sendTx);
+        console.log("Send successful!");
+      });
+    </script>
+  </body>
+</html>
