@@ -10,6 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "elusiv-sdk": "file:elusiv-sdk",
     "http-server": "^14.1.1",
     "i": "^0.3.7",
     "package": "^1.0.1"

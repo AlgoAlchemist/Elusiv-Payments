@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>Elusiv ZK payments Interface</title>
-    <script src="elusive.js"></script>
     <style>
       body {
         background: linear-gradient(to right, #2b2d42, #000000);
@@ -46,9 +45,11 @@
       <button id="transfer-button">Transfer</button>
     </div>
     <script>
-      const connectButton = document.getElementById("connect-button");
-      const topupButton = document.getElementById("topup-button");
-      const topupAmount = document.getElementById("top up-amount");
+import {Elusiv } from "elusiv-sdk";
+//require('Elusiv-sdk');
+const connectButton = document.getElementById("connect-button");
+const topupButton = document.getElementById("topup-button");
+const topupAmount = document.getElementById("top up-amount");
 const transferButton = document.getElementById("transfer-button");
 const transferAmount = document.getElementById("transfer-amount");
 const transferRecipient = document.getElementById("transfer-recipient");
